@@ -1,0 +1,485 @@
+Strict
+
+Import mojo.app
+
+
+Public Class DateTime
+	Private Global daysSinceYearStart:Int[] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+	Private Global monthDays:Int[] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+	Private Global weekdayname:String[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+	Private Global monthname:String[] = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+	
+	Private Function DaysSince1970:Int(_year:Int, _month:Int, _day:Int)
+		Local leapYears:Int = ((_year-1)-1968)/4   - ((_year-1)-1900)/100   + ((_year-1)-1600)/400
+		Local daysSince1970:Int = (_year-1970)*365 + leapYears   +   daysSinceYearStart[_month-1] + _day-1
+		If((_month > 2) And (_year Mod 4 = 0 And (_year Mod 100 <> 0 Or _year Mod 400 = 0))) Then
+			daysSince1970 += 1 ' + one leap day if jear is leap year
+		EndIf
+		Return daysSince1970
+	End
+	
+	Private Method DayTimeInSeconds:Int(_hours:Int, _minutes:Int, _seconds:Int)
+		Return _seconds + _minutes*60 + _hours*3600
+	End
+	
+	Private Field days:Int
+	Private Field seconds:Int
+	
+	Public Method New()
+		days = DaysSince1970(1970, 1, 1)
+		seconds = DayTimeInSeconds(0, 0, 0)
+	End
+	
+	Public Method New(year:Int, month:Int, day:Int)
+		days = DaysSince1970(year, month, day)
+		seconds = DayTimeInSeconds(0, 0, 0)
+	End
+	
+	Public Method New(year:Int, month:Int, day:Int, hours:Int, minutes:Int, seconds:Int)
+		Self.days = DaysSince1970(year, month, day)
+		Self.seconds = DayTimeInSeconds(hours, minutes, seconds)
+	End
+	
+	Public Method SetDate:Void(year:Int, month:Int, day:Int)
+		If year < 1970 Then year = 1970
+		If month < 1 Then
+			month = 1
+		ElseIf month > 12 Then
+			month = 12
+		EndIf
+		If day < 1 Then
+			day = 1
+		Else
+			Local maxDay:Int = monthDays[month-1]
+			If((month = 2) And (year Mod 4 = 0 And (year Mod 100 <> 0 Or year Mod 400 = 0))) Then maxDay += 1
+			If day > maxDay Then day = maxDay
+		EndIf
+		days = DaysSince1970(year, month, day)
+	End
+	
+	Public Method SetTime:Void(hours:Int, minutes:Int, seconds:Int)
+		If hours < 0 Then
+			hours = 0
+		ElseIf hours > 23 Then
+			hours = 23
+		EndIf
+		If minutes < 0 Then
+			minutes = 0
+		ElseIf minutes > 59 Then
+			minutes = 50
+		EndIf
+		If seconds < 0 Then
+			seconds = 0
+		ElseIf seconds > 59 Then
+			seconds = 59
+		EndIf
+		Self.seconds = DayTimeInSeconds(hours, minutes, seconds)
+	End
+	
+	' returns: Int[year, month, day]
+	Public Method GetDate:Int[]()
+		Local x:Int = (days*4+102032)/146097+15
+		Local b:Int = days+2442113+x-(x/4)
+		Local c:Int = (b*20-2442)/7305
+		Local d:Int = b-365*c-c/4
+		Local e:Int = d*1000/30601
+		Local f:Int = d-e*30-e*601/1000
+		If e < 14 Then
+			Return [c-4716, e-1, f]
+		EndIf
+		Return [c-4715, e-13, f]
+	End
+	
+	' returns Int[hours, minute, seconds]
+	Public Method GetTime:Int[]()
+		Return [seconds/3600, seconds/60 Mod 60, seconds Mod 60]
+	End
+	
+	Public Method AddSeconds:Void(s:Int)
+		seconds += s
+		If seconds >= 86400 Then
+			days += seconds/86400
+			seconds = seconds Mod 86400
+		ElseIf seconds < 0
+			days += seconds/86400
+			seconds = seconds Mod 86400
+			days -= 1
+			seconds += 86400
+		EndIf
+	End
+	
+	Public Method AddMinutes:Void(m:Int)
+		AddSeconds(m*60)
+	End
+	
+	Public Method AddHours:Void(h:Int)
+		AddSeconds(h*3600)
+	End
+	
+	Public Method AddDays:Void(d:Int)
+		days += d
+	End
+	
+	Public Method AddMonths:Void(m:Int)
+		Local y:Int = m/12
+		m = m Mod 12
+		Local date:Int[] = GetDate()
+		If m < 0 Then
+			m += 12
+			y -= 1
+		End
+		SetDate(date[0]+y, date[1]+m, date[2])
+	End
+	
+	Public Method AddYears:Void(y:Int)
+		Local date:Int[] = GetDate()
+		SetDate(date[0]+y, date[1], date[2])
+	End
+	
+	Public Method IsLeapYear:Bool()
+		Local x:Int = (days*4+102032)/146097+15
+		Local b:Int = days+2442113+x-(x/4)
+		Local c:Int = (b*20-2442)/7305
+		Local d:Int = b-365*c-c/4
+		Local e:Int = d*1000/30601
+		Local year:Int
+		If e < 14 Then
+			year = c-4716
+		Else
+			year = c-4715
+		EndIf
+		If (year Mod 4 = 0 And (year Mod 100 <> 0 Or year Mod 400 = 0)) Then Return True
+		Return False
+	End
+	
+	Public Function IsLeapYear:Bool(year:Int)
+		If (year Mod 4 = 0 And (year Mod 100 <> 0 Or year Mod 400 = 0)) Then Return True
+		Return False
+	End
+	
+	Public Function DaysInMonth:Int(year:Int, month:Int)
+		If month < 1 Then
+			month = 1
+		ElseIf month > 12 Then
+			month = 12
+		EndIf
+		Local d:Int = monthDays[month-1]
+		If month = 2 Then
+			If IsLeapYear(year) Then d += 1
+		EndIf
+		Return d
+	End
+	
+	Public Method IsSameDay:Bool(date:DateTime)
+		If days = date.days Then Return True
+		Return False
+	End
+	
+	Public Method DayOfYear:Int()
+		Local temp:Int[] = GetDate()
+		Local tempDays:Int = DaysSince1970(temp[0], 1, 1)
+		Return days - tempDays + 1
+	End
+	
+	Public Method SecondsTo:Int(date:DateTime)
+		Local dd:Int = date.days - days
+		Local ds:Int = date.seconds - seconds
+		Return dd*86400 + ds
+	End
+	
+	Public Method MinutesTo:Int(date:DateTime)
+		Local dd:Int = date.days - days
+		Local dm:Int = date.seconds/60 - seconds/60
+		Return dd*1440 + dm
+	End
+	
+	Public Method HoursTo:Int(date:DateTime)
+		Local dd:Int = date.days - days
+		Local dh:Int = date.seconds/3600 - seconds/3600
+		Return dd*24 + dh
+	End
+	
+	Public Method FloatSecondsTo:Float(date:DateTime)
+		Local dd:Float = date.days - days
+		Local ds:Float = date.seconds - seconds
+		Return dd*86400 + ds
+	End
+	
+	Public Method FloatMinutesTo:Float(date:DateTime)
+		Local dd:Float = date.days - days
+		Local dm:Float = date.seconds/60 - seconds/60
+		Return dd*1440 + dm
+	End
+	
+	Public Method FloatHoursTo:Float(date:DateTime)
+		Local dd:Float = date.days - days
+		Local dh:Float = date.seconds/3600 - seconds/3600
+		Return dd*24 + dh
+	End
+	
+	Public Method DaysTo:Int(date:DateTime)
+		Return date.days - days
+	End
+	
+	Public Method MonthTo:Int(date:DateTime)
+		Local temp1:Int[] = GetDate()
+		Local temp2:Int[] = date.GetDate()
+		Return (temp2[0]*12+temp2[1]) - (temp1[0]*12+temp1[1])
+	End
+	
+	Public Method YearsTo:Int(date:DateTime)
+		Local temp1:Int[] = GetDate()
+		Local temp2:Int[] = date.GetDate()
+		Return temp2[0] - temp1[0]
+	End
+	
+	Public Method SetToCurrentTime:Void()
+		Local temp:Int[] = app.GetDate()
+		SetDate(temp[0], temp[1], temp[2])
+		SetTime(temp[3], temp[4], temp[5])
+	End
+	
+	Public Function CurrentDate:DateTime()
+		Local temp:DateTime = New DateTime
+		temp.SetToCurrentTime()
+		Return temp
+	End
+	
+	Public Method Copy:DateTime()
+		Local temp:DateTime = New DateTime
+		temp.days = days
+		temp.seconds = seconds
+		Return temp
+	End
+	
+	Public Method Seconds:Int() Property
+		Return seconds Mod 60
+	End
+	
+	Public Method Minutes:Int() Property
+		Return seconds/60 Mod 60
+	End
+	
+	Public Method Hours:Int() Property
+		Return seconds/3600
+	End
+	
+	Public Method Day:Int() Property
+		Local x:Int = (days*4+102032)/146097+15
+		Local b:Int = days+2442113+x-(x/4)
+		Local c:Int = (b*20-2442)/7305
+		Local d:Int = b-365*c-c/4
+		Local e:Int = d*1000/30601
+		Local f:Int = d-e*30-e*601/1000
+		Return f
+	End
+	
+	Public Method Month:Int() Property
+		Local x:Int = (days*4+102032)/146097+15
+		Local b:Int = days+2442113+x-(x/4)
+		Local c:Int = (b*20-2442)/7305
+		Local d:Int = b-365*c-c/4
+		Local e:Int = d*1000/30601
+		Local f:Int = d-e*30-e*601/1000
+		If e < 14 Then
+			Return e-1
+		EndIf
+		Return e-13
+	End
+	
+	Public Method Year:Int() Property
+		Local x:Int = (days*4+102032)/146097+15
+		Local b:Int = days+2442113+x-(x/4)
+		Local c:Int = (b*20-2442)/7305
+		Local d:Int = b-365*c-c/4
+		Local e:Int = d*1000/30601
+		Local f:Int = d-e*30-e*601/1000
+		If e < 14 Then
+			Return c-4716
+		EndIf
+		Return c-4715
+	End
+	
+	Public Method Seconds:Void(s:Int) Property
+		Local time:Int[] = GetTime()
+		SetTime(time[0], time[1], s)
+	End
+	
+	Public Method Minutes:Void(m:Int) Property
+		Local time:Int[] = GetTime()
+		SetTime(time[0], m, time[2])
+	End
+	
+	Public Method Hours:Void(h:Int) Property
+		Local time:Int[] = GetTime()
+		SetTime(h, time[1], time[2])
+	End
+	
+	Public Method Day:Void(d:Int) Property
+		Local date:Int[] = GetDate()
+		SetDate(date[0], date[1], d)
+	End
+	
+	Public Method Month:Void(m:Int) Property
+		Local date:Int[] = GetDate()
+		SetDate(date[0], m, date[2])
+	End
+	
+	Public Method Year:Void(y:Int) Property
+		Local date:Int[] = GetDate()
+		SetDate(y, date[1], date[2])
+	End
+	
+	Public Function FromString:DateTime(date:String) ' "YYYY-MM-DD hh:mm:ss"
+		Local d:DateTime = New DateTime
+		date = date.Trim()
+		Local temp:String[] = date.Split(" ")
+		For Local s:String = Eachin temp
+			If s.Contains("-") Then
+				Local t:String[] = s.Split("-")
+				For Local i:Int = 0 To 2
+					If i >= t.Length Then Exit
+					Select i
+					Case 0
+						d.Year = Int(t[i])
+					Case 1
+						d.Month = Int(t[i])
+					Case 2
+						d.Day = Int(t[i])
+					End
+				End
+				Exit
+			End
+		End
+		For Local s:String = Eachin temp
+			If s.Contains(":") Then
+				Local t:String[] = s.Split(":")
+				For Local i:Int = 0 To 2
+					If i >= t.Length Then Exit
+					Select i
+					Case 0
+						d.Hours = Int(t[i])
+					Case 1
+						d.Minutes = Int(t[i])
+					Case 2
+						d.Seconds = Int(t[i])
+					End
+				End
+				Exit
+			End
+		End
+		Return d
+	End
+	
+	Public Method GetInternalDays:Int()
+		Return days
+	End
+	
+	Public Method GetInternalSeconds:Int()
+		Return seconds
+	End
+	
+	Public Method SetInternalDays:Void(days:Int)
+		Self.days = days
+	End
+	
+	Public Method SetInternalSeconds:Void(seconds:Int)
+		Self.seconds = seconds
+	End
+	
+	
+	Public Method ToString:String()
+		Return Format("#(YYYY)-#(MM)-#(DD) #(hh):#(mm):#(ss)")
+	End
+	
+	'Public Method ToString:String(format:String = "#(YYYY)-#(MM)-#(DD) #(hh):#(mm):#(ss)")
+	Public Method Format:String(format:String)
+		Local date:Int[] = GetDate()
+		Local time:Int[] = GetTime()
+		Local wd:String = WeekdayString()
+		Local hap:Int = time[0]
+		Local ap:String = "AM"
+		If time[0] >  12 Then hap = hap Mod 12
+		If time[0] >= 12 Then ap = "PM"
+		Local th:String
+		If date[2] = 11 Or date[2] = 12 Or date[2] = 13 Then
+			th = "th"
+		ElseIf date[2] Mod 10 = 1 Then
+			th = "st"
+		ElseIf date[2] Mod 10 = 2 Then
+			th = "nd"
+		ElseIf date[2] Mod 10 = 3 Then
+			th = "rd"
+		Else
+			th = "th"
+		EndIf
+		
+		format = format.Replace("#(YYYY)", date[0])
+		format = format.Replace("#(YY)", String(date[0])[2 ..])
+		format = format.Replace("#(MMMM)", monthname[(date[1]-1)])
+		format = format.Replace("#(MMM)", monthname[(date[1]-1)][.. 3])
+		format = format.Replace("#(MM)", ("0"+date[1])[-2..])
+		format = format.Replace("#(M)", date[1])
+		format = format.Replace("#(DDDD)", wd)
+		format = format.Replace("#(DDD)", wd[.. 3])
+		format = format.Replace("#(DD)", ("0"+date[2])[-2..])
+		format = format.Replace("#(D)", date[2])
+		format = format.Replace("#(DDth)", ("0"+date[2])[-2..]+th)
+		format = format.Replace("#(Dth)", date[2]+th)
+		format = format.Replace("#(hh)", ("0"+time[0])[-2 ..])
+		format = format.Replace("#(h)", time[0])
+		format = format.Replace("#(hh12)", ("0"+hap)[-2 ..])
+		format = format.Replace("#(h12)", hap)
+		format = format.Replace("#(AP)", ap)
+		format = format.Replace("#(ap)", ap.ToLower())
+		format = format.Replace("#(mm)", ("0"+time[1])[-2 ..])
+		format = format.Replace("#(m)", time[1])
+		format = format.Replace("#(ss)", ("0"+time[2])[-2 ..])
+		format = format.Replace("#(s)", time[2])
+		
+		Return format
+	End
+	
+	Public Method WeekdayString:String()
+		Local date:Int[] = GetDate()
+		Local year:Int = date[0]
+		Local month:Int = date[1]
+		Local day:Int = date[2]
+		Local JND:Int   =   day   +   ((153 * (month + 12 * ((14 - month) / 12) - 3) + 2) / 5)   +   (365 * (year + 4800 - ((14 - month) / 12)))   +   ((year + 4800 - ((14 - month) / 12)) / 4)   -   ((year + 4800 - ((14 - month) / 12)) / 100)   +    ((year + 4800 - ((14 - month) / 12)) / 400)   -   32045
+		return weekdayname[JND Mod 7]
+	End
+	
+	Public Method Weekday:Int()
+		Local date:Int[] = GetDate()
+		Local year:Int = date[0]
+		Local month:Int = date[1]
+		Local day:Int = date[2]
+		Local JND:Int   =   day   +   ((153 * (month + 12 * ((14 - month) / 12) - 3) + 2) / 5)   +   (365 * (year + 4800 - ((14 - month) / 12)))   +   ((year + 4800 - ((14 - month) / 12)) / 4)   -   ((year + 4800 - ((14 - month) / 12)) / 100)   +    ((year + 4800 - ((14 - month) / 12)) / 400)   -   32045
+		return JND Mod 7 + 1
+	End
+End
+
+Public Class DateTimeList Extends List<DateTime>
+	Public Method Compare:Int(a:DateTime, b:DateTime)
+		If a.days > b.days Return 1
+		If a.days < b.days Return -1
+		If a.seconds > b.seconds Return 1
+		If a.seconds < b.seconds Return -1
+		Return 0
+	End
+End
+
+Public Class DateTimeMap<V> Extends Map<DateTime, V>
+	Public Method Compare:Int(a:DateTime, b:DateTime)
+		If a.days > b.days Return 1
+		If a.days < b.days Return -1
+		If a.seconds > b.seconds Return 1
+		If a.seconds < b.seconds Return -1
+		Return 0
+	End
+End
+
+
+
+
+

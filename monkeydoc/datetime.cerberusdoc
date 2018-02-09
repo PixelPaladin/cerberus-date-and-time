@@ -1,0 +1,339 @@
+# Module libdatetime
+The DateTime module provides a class for date and time handling.
+
+
+# Import mojo.app
+
+
+# Class CDateTime
+Date and time class.
+
+
+# Method New()
+Constructor of the CDateTime class.
+
+
+# Method New(year:Int, month:Int, day:Int)
+Constructor of the CDateTime class.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @year		| @Int		| year			| -
+| @month	| @Int		| month			| -
+| @day		| @Int		| day			| -
+
+
+# Method New(year:Int, month:Int, day:Int, hours:Int, minutes:Int, seconds:Int)
+Constructor of the CDateTime class.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @year		| @Int		| year			| -
+| @month	| @Int		| month			| -
+| @day		| @Int		| day			| -
+| @hours	| @Int		| hours			| -
+| @minutes	| @Int		| minutes		| -
+| @seconds	| @Int		| seconds		| -
+
+
+
+# Method SetDate:Void(year:Int, month:Int, day:Int)
+Seths the date.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @year		| @Int		| year			| -
+| @month	| @Int		| month			| -
+| @day		| @Int		| day			| -
+
+
+# Method SetTime:Void(hours:Int, minutes:Int, seconds:Int)
+Sets the time.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @hours	| @Int		| hours			| -
+| @minutes	| @Int		| minutes		| -
+| @seconds	| @Int		| seconds		| -
+
+
+# Method GetDate:Int[]()
+Returns an array which contains the date (Int[year, month, day]).
+
+
+# Method GetTime:Int[]()
+Returns an array which contains the time (Int[hours, minute, seconds]).
+
+
+# Method AddSeconds:Void(s:Int)
+Adds a number of seconds.
+
+| Parameter	| DataType	| Descroption		| Default Value
+| @s		| @Int		| number of seconds	| -
+
+
+# Method AddMinutes:Void(m:Int)
+Adds a number of minutes.
+
+| Parameter	| DataType	| Descroption		| Default Value
+| @m		| @Int		| number of minutes	| -
+
+
+# Method AddHours:Void(h:Int)
+Adds a number of hours.
+
+| Parameter	| DataType	| Descroption		| Default Value
+| @h		| @Int		| number of hours	| -
+
+
+# Method AddDays:Void(d:Int)
+Adds a number of days.
+
+| Parameter	| DataType	| Descroption		| Default Value
+| @d		| @Int		| number of days	| -
+
+
+# Method AddMonths:Void(m:Int)
+Adds a number of months.
+
+| Parameter	| DataType	| Descroption		| Default Value
+| @m		| @Int		| number of months	| -
+
+
+# Method AddYears:Void(y:Int)
+Adds a number of years.
+
+| Parameter	| DataType	| Descroption		| Default Value
+| @y		| @Int		| number of years	| -
+
+
+# Method IsLeapYear:Bool()
+Returns true if the year is a leap year.
+
+# Function IsLeapYear:Bool(year:Int)
+Returns true if the year is a leap year.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @year		| @Int		| year			| -
+
+
+# Function DaysInMonth:Int(year:Int, month:Int)
+Returns the number of days in a month.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @year		| @Int		| year			| -
+| @month	| @Int		| month number	| -
+
+
+# Method IsSameDay:Bool(date:CDateTime)
+Returns true if the the day component is the same as the day component of the
+date parameter.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method DayOfYear:Int()
+Returns the number of days since the beginning of the year.
+
+
+# Method SecondsTo:Int(date:CDateTime)
+Returns the time difference to the date parameter in seconds.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method MinutesTo:Int(date:CDateTime)
+Returns the time difference to the date parameter in minutes.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method HoursTo:Int(date:CDateTime)
+Returns the time difference to the date parameter in hours.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method FloatSecondsTo:Float(date:CDateTime)
+Returns the time difference to the date parameter in seconds as float value.
+This may help in cases of big time differences.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method FloatMinutesTo:Float(date:CDateTime)
+Returns the time difference to the date parameter in minutes as float value.
+This may help in cases of big time differences.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method FloatHoursTo:Float(date:CDateTime)
+Returns the time difference to the date parameter in hours as float value.
+This may help in cases of big time differences.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method DaysTo:Int(date:CDateTime)
+Returns the time difference to the date parameter in days.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method MonthTo:Int(date:CDateTime)
+Returns the time difference to the date parameter in months.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method YearsTo:Int(date:CDateTime)
+Returns the time difference to the date parameter in years.
+
+| Parameter	| DataType		| Descroption	| Default Value
+| @date		| @CDateTime	| a date		| -
+
+
+# Method SetToCurrentTime:Void()
+This sets the date and time to the current date and time.
+
+
+# Function CurrentDate:CDateTime()
+This creates a new date time value with the current date and time.
+
+
+# Method Copy:CDateTime()
+This creates a copy of the date time.
+
+
+# Method Seconds:Int() Property
+This returns the seconds component.
+
+
+# Method Minutes:Int() Property
+This returns the minutes component.
+
+
+# Method Hours:Int() Property
+This returns the hours component.
+
+
+# Method Day:Int() Property
+This returns the day component.
+
+
+# Method Month:Int() Property
+This returns the month component.
+
+
+# Method Year:Int() Property
+This returns the year component.
+
+
+# Method Seconds:Void(s:Int) Property
+This sets the seconds.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @s		| @Int		| seconds		| -
+
+
+# Method Minutes:Void(m:Int) Property
+This sets the minutes.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @m		| @Int		| minutes		| -
+
+
+# Method Hours:Void(h:Int) Property
+This sets the hours.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @h		| @Int		| hours			| -
+
+
+# Method Day:Void(d:Int) Property
+This sets the day.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @d		| @Int		| day			| -
+
+
+# Method Month:Void(m:Int) Property
+This sets the month.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @m		| @Int		| month			| -
+
+
+# Method Year:Void(y:Int) Property
+This sets the year.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @y		| @Int		| year			| -
+
+
+# Method ToString:String(format:String = "#(YYYY)-#(MM)-#(DD) #(hh):#(mm):#(ss)")
+This returns a the date and time using a format string.
+
+| Parameter	| DataType	| Descroption	| Default Value
+| @format	| @String	| format string	| "#(YYYY)-#(MM)-#(DD) #(hh):#(mm):#(ss)"
+
+The following expressions may be used:
+
+| Expression	| Output
+| "#(YYYY)"		| the year as four digit number
+| "#(YY)"		| the year as two digit number (00-99)
+| "#(MMMM)"		| the full month name ("January" to "December")
+| "#(MMM)"		| the abbreviated month name ("Jan" to "Dec")
+| "#(MM)"		| the month as number with a leading zero (01-12)
+| "#(M)"		| the month as number without a leading zero (1-12)
+| "#(DDDD)"		| the full day name ("Monday" to "Sunday")
+| "#(DDD)"		| the abbreviated day name ("Mon" to "Sun")
+| "#(DD)"		| the day as number with a leading zero (01 to 31)
+| "#(D)"		| the day as number without a leading zero (1 to 31)
+| "#(DDth)"		| the day as number with a leading zero ("01st" to "31st")
+| "#(Dth)"		| the day as number without a leading zero ("1st" to "31st")
+| "#(hh)"		| the hour with a leading zero in 24 hours format (00 to 23)
+| "#(h)"		| the hour without a leading zero in 24 hours format (0 to 23)
+| "#(hh12)"		| the hour with a leading zero in 12 hours format (01 to 12)
+| "#(h12)"		| the hour without a leading zero in 12 hours format (1 to 12)
+| "#(AP)"		| will be replaced by either "AM" or "PM"
+| "#(ap)"		| will be replaced by either "am" or "pm"
+| "#(mm)"		| the minute with a leading zero (00 to 59)
+| "#(m)"		| the minute without a leading zero (0 to 59)
+| "#(s)"		| the second without a leading zero (0 to 59)
+| "#(ss)"		| the second with a leading zero (00 to 59)
+
+
+# Method WeekdayString:String()
+This returns the name of the week day.
+
+
+# Method Weekday:Int()
+This returns the number of the week day ("Monday" = 1, "Sunday" = 7).
+
+
+
+# Class CDateTimeList
+A date and time list class.
+
+# Method Compare:Int(a:CDateTime, b:CDateTime)
+Compare method for sorting.
+
+
+
+# Class CDateTimeMap<V> Extends Map<CDateTime, V>
+A date and time map class.
+
+# Method Compare:Int(a:CDateTime, b:CDateTime)
+Compare method for sorting.
+
+
+
+
+
